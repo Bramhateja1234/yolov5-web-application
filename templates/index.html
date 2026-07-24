@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLOv5 Object Detection | Vision AI</title>
+    <meta name="description" content="Real-time object detection powered by YOLOv5 — image, video, and live camera.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+    <div class="bg-orb orb3"></div>
+
+    <div class="page-wrapper">
+
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span>YOLOv5 <strong>Vision</strong></span>
+            </div>
+            <div class="header-badge">
+                <span class="pulse-dot"></span> Model Ready
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <div class="hero-text">
+            <h1>Detect Objects <span class="gradient-text">Instantly</span></h1>
+            <p>Upload an image or video, or use your live camera — YOLOv5 detects objects in milliseconds.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-wrap">
+            <div class="tabs" role="tablist">
+                <button class="tab active" id="tab-image"  role="tab" data-tab="image">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Image
+                </button>
+                <button class="tab" id="tab-video" role="tab" data-tab="video">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="15" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M17 9l5-3v12l-5-3V9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                    Video
+                </button>
+                <button class="tab" id="tab-camera" role="tab" data-tab="camera">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 7l-7 5 7 5V7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+                    Live Camera
+                </button>
+                <button class="tab" id="tab-batch" role="tab" data-tab="batch">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                    Batch Analyzer
+                </button>
+                <div class="tab-indicator"></div>
+            </div>
+        </div>
+
+        <main>
+
+            <!-- ══ IMAGE TAB ══════════════════════════════════════ -->
+            <section id="pane-image" class="tab-pane active">
+
+                <!-- Upload area -->
+                <div id="img-upload-section">
+                    <div id="img-drop-area" class="drop-area">
+                        <div class="drop-inner">
+                            <div class="upload-icon-wrap">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M21 15V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            </div>
+                            <h2>Drag &amp; Drop Image</h2>
+                            <p class="drop-sub">JPG · PNG · WEBP · BMP</p>
+                            <div class="divider"><span>or</span></div>
+                            <input type="file" id="img-file-input" accept="image/*" hidden>
+                            <button id="img-browse-btn" class="btn btn-primary">Browse Image</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="img-loading" class="loading-section hidden">
+                    <div class="loading-card">
+                        <div class="radar"><div class="radar-ring"></div><div class="radar-ring"></div><div class="radar-ring"></div><div class="radar-dot"></div></div>
+                        <h2>Analyzing Image...</h2>
+                        <p>YOLOv5 is scanning for objects</p>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div id="img-result-section" class="result-section hidden">
+                    <div class="result-header">
+                        <div>
+                            <h2>Detection Results</h2>
+                            <p id="img-detection-summary" class="result-subtitle"></p>
+                        </div>
+                        <button id="img-reset-btn" class="btn btn-outline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12A9 9 0 1 0 6.8 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="3 3 3 9 9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            New Image
+                        </button>
+                    </div>
+                    <div class="result-grid">
+                        <div class="images-panel">
+                            <div class="image-card">
+                                <div class="image-card-label"><span class="dot dot-blue"></span> Original</div>
+                                <div class="image-wrap"><img id="img-original" src="" alt="Original"></div>
+                            </div>
+                            <div class="image-card">
+                                <div class="image-card-label"><span class="dot dot-green"></span> Detected</div>
+                                <div class="image-wrap"><img id="img-result" src="" alt="Result"></div>
+                            </div>
+                        </div>
+                        <div class="detections-panel">
+                            <h3>Objects Found</h3>
+                            <ul id="img-detection-list" class="detection-list"></ul>
+                            <div id="img-no-detection" class="no-detection hidden">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                <p>No objects detected</p><span>Try a different image</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ VIDEO TAB ══════════════════════════════════════ -->
+            <section id="pane-video" class="tab-pane hidden">
+
+                <div id="vid-upload-section">
+                    <div id="vid-drop-area" class="drop-area">
+                        <div class="drop-inner">
+                            <div class="upload-icon-wrap accent-video">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="15" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M17 9l5-3v12l-5-3V9z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                            </div>
+                            <h2>Drag &amp; Drop Video</h2>
+                            <p class="drop-sub">MP4 · AVI · MOV · MKV</p>
+                            <div class="divider"><span>or</span></div>
+                            <input type="file" id="vid-file-input" accept="video/*" hidden>
+                            <button id="vid-browse-btn" class="btn btn-primary btn-video">Browse Video</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="vid-loading" class="loading-section hidden">
+                    <div class="loading-card">
+                        <div class="radar radar-video"><div class="radar-ring"></div><div class="radar-ring"></div><div class="radar-ring"></div><div class="radar-dot"></div></div>
+                        <h2>Processing Video...</h2>
+                        <p id="vid-progress-text">Running YOLOv5 on each frame</p>
+                        <div class="progress-bar-wrap">
+                            <div id="vid-progress-bar" class="progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div id="vid-result-section" class="result-section hidden">
+                    <div class="result-header">
+                        <div>
+                            <h2>Video Results</h2>
+                            <p id="vid-detection-summary" class="result-subtitle"></p>
+                        </div>
+                        <button id="vid-reset-btn" class="btn btn-outline">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 12A9 9 0 1 0 6.8 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="3 3 3 9 9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            New Video
+                        </button>
+                    </div>
+                    <div class="result-grid">
+                        <div class="image-card video-result-card">
+                            <div class="image-card-label"><span class="dot dot-green"></span> Processed Video</div>
+                            <video id="vid-result-player" controls playsinline style="width:100%;border-radius:0 0 16px 16px;background:#000;"></video>
+                        </div>
+                        <div class="detections-panel">
+                            <h3>Labels Detected</h3>
+                            <ul id="vid-detection-list" class="detection-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ CAMERA TAB ══════════════════════════════════════ -->
+            <section id="pane-camera" class="tab-pane hidden">
+                <div class="camera-container">
+
+                    <div class="camera-grid">
+                        <!-- Live feed -->
+                        <div class="image-card camera-card">
+                            <div class="image-card-label">
+                                <span class="dot dot-blue"></span> Live Camera
+                                <span id="cam-fps-badge" class="fps-badge hidden"></span>
+                            </div>
+                            <div class="camera-wrap">
+                                <video id="cam-video" autoplay playsinline muted></video>
+                                <canvas id="cam-capture" hidden></canvas>
+                                <div id="cam-placeholder" class="cam-placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M5 12a7 7 0 1 0 14 0A7 7 0 0 0 5 12z" stroke="currentColor" stroke-width="2"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                    <p>Camera not started</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detected feed -->
+                        <div class="image-card camera-card">
+                            <div class="image-card-label"><span class="dot dot-green"></span> Detected Output</div>
+                            <div class="camera-wrap">
+                                <img id="cam-result" src="" alt="Detection Output" style="width:100%;height:100%;object-fit:contain;display:none;background:#000;">
+                                <div id="cam-result-placeholder" class="cam-placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <p>Results appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="camera-controls">
+                        <button id="cam-start-btn" class="btn btn-primary btn-camera">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/></svg>
+                            Start Camera
+                        </button>
+                        <button id="cam-stop-btn" class="btn btn-danger hidden">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><rect x="9" y="9" width="6" height="6" fill="currentColor"/></svg>
+                            Stop Camera
+                        </button>
+                        <div id="cam-detection-live" class="cam-live-tags"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ BATCH ANALYZER TAB ════════════════════════════ -->
+            <section id="pane-batch" class="tab-pane hidden">
+                <div class="batch-grid">
+                    <!-- Left: Input files list and run action -->
+                    <div class="image-card batch-card input-files-card">
+                        <div class="image-card-label">
+                            <span><span class="dot dot-blue"></span> Input Folder (`data/images`)</span>
+                            <button id="batch-run-btn" class="btn btn-primary btn-batch-run" style="padding: 0.3rem 1rem; font-size: 0.8rem;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-right:2px;"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
+                                Run Detection
+                            </button>
+                        </div>
+                        <div class="batch-file-list-wrap">
+                            <ul id="batch-input-list" class="batch-file-list"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Middle: Runs list and processed files -->
+                    <div class="image-card batch-card runs-card">
+                        <div class="image-card-label">
+                            <span><span class="dot dot-green"></span> Detection Runs (`runs/detect`)</span>
+                            <select id="batch-runs-select" class="batch-select">
+                                <option value="">Loading runs...</option>
+                            </select>
+                        </div>
+                        <div class="batch-file-list-wrap">
+                            <ul id="batch-output-list" class="batch-file-list"></ul>
+                            <div id="batch-no-runs" class="no-detection hidden">
+                                <p>No detection runs found</p>
+                                <span>Run detection to generate outputs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Analysis/Preview Panel -->
+                    <div class="image-card batch-card preview-card">
+                        <div class="image-card-label">
+                            <span>Preview File</span>
+                            <span id="batch-preview-name" class="preview-filename-badge">No file selected</span>
+                        </div>
+                        <div class="batch-preview-wrap">
+                            <img id="batch-preview-img" src="" alt="Run Preview" class="hidden">
+                            <video id="batch-preview-vid" controls playsinline class="hidden"></video>
+                            <div id="batch-preview-placeholder" class="cam-placeholder">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="2"/></svg>
+                                <p>Select a processed file to analyze</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer><p>Powered by <strong>YOLOv5</strong> · Ultralytics &nbsp;|&nbsp; <span id="footer-time"></span></p></footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
